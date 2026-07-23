@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WealthBridge Architectural Deep-Dive & Alternatives Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0c10;
+            --bg-secondary: #121520;
+            --bg-tertiary: #191d2c;
+            --accent-blue: #00b0ff;
+            --accent-green: #00e676;
+            --accent-red: #ff3d00;
+            --text-main: #f0f3f8;
+            --text-muted: #8c9cb2;
+            --border-color: #242c42;
+            --code-bg: #1c2130;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.8;
+            padding: 3.5rem 2rem;
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: 0 auto;
+        }
+
+        header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 2.5rem;
+            margin-bottom: 3.5rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 900;
+            font-size: 3rem;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.8rem;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            font-weight: 300;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .step-block {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            position: relative;
+        }
+
+        .step-num {
+            position: absolute;
+            top: -1.5rem;
+            left: 2rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+            color: #000;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 800;
+            font-size: 1.1rem;
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0, 176, 255, 0.4);
+        }
+
+        h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.7rem;
+            font-weight: 700;
+            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+        }
+
+        h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-top: 1.8rem;
+            margin-bottom: 0.8rem;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        p {
+            margin-bottom: 1.2rem;
+            color: #d1d6e6;
+            font-size: 1.05rem;
+        }
+
+        ul {
+            margin-bottom: 1.5rem;
+            padding-left: 2.2rem;
+            color: #d1d6e6;
+        }
+
+        li {
+            margin-bottom: 0.6rem;
+        }
+
+        .analysis-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.8rem 0;
+            background-color: var(--bg-tertiary);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        th, td {
+            padding: 1.2rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #1e2336;
+            color: var(--accent-green);
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .highlight-pro {
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        .highlight-con {
+            color: var(--accent-red);
+            font-weight: 600;
+        }
+
+        .tag {
+            background-color: var(--code-bg);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #f7b05b;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>WealthBridge Architectural Deep-Dive</h1>
+        <p class="subtitle">A Step-by-Step Rationale of System Implementations, Technological Selections, and Alternatives Analysis</p>
+    </header>
+
+    <!-- STEP 1 -->
+    <div class="step-block">
+        <div class="step-num">STEP 1</div>
+        <h2>Raw Data Storage Intake (S3 Landing Bucket)</h2>
+        <p>The entry point of the pipeline. Files containing transactions and positions are dropped here daily by upstream legacy platforms.</p>
+        
+        <h3>Why We Used It</h3>
+        <p>Amazon S3 provides cloud-native, infinitely scalable object storage. It integrates out of the box with AWS lambda notification events and maintains a SLA durability of 99.999999999%.</p>
+
+        <h3>Alternatives vs. Advantages</h3>
+        <table class="analysis-table">
+            <thead>
+                <tr>
+                    <th style="width: 25%">Alternative</th>
+                    <th style="width: 35%">Pros & Cons</th>
+                    <th style="width: 40%">Why S3 is Better for this Project</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>AWS EFS / Shared FS</strong></td>
+                    <td>
+                        <span class="highlight-pro">+ Standard file access</span><br/>
+                        <span class="highlight-con">- High cost, complex mounting</span>
+                    </td>
+                    <td>S3 is significantly cheaper and emits native, direct events when objects are uploaded, which triggers our preprocessor.</td>
+                </tr>
+                <tr>
+                    <td><strong>Self-Hosted SFTP Server</strong></td>
+                    <td>
+                        <span class="highlight-pro">+ Legacy compatibility</span><br/>
+                        <span class="highlight-con">- Single point of failure, manual scaling</span>
+                    </td>
+                    <td>S3 eliminates server management and scales automatically as file volumes grow or shrink.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step-block">
+        <div class="step-num">STEP 2</div>
+        <h2>Completeness Check Orchestration (AWS Lambda)</h2>
+        <p>An event-driven Lambda function acting as a gatekeeper. It intercept S3 events and prevents triggering Glue until the file pair for a specific <span class="tag">file_id</span> is complete.</p>
+        
+        <h3>Why We Used It</h3>
+        <p>Glue PySpark jobs take 1 to 2 minutes to spin up and cost money for every second of runtime. Utilizing a lightweight, fast Lambda function ensures we do not run Glue with missing files, avoiding wasted expenses.</p>
+
+        <h3>Alternatives vs. Advantages</h3>
+        <table class="analysis-table">
+            <thead>
+                <tr>
+                    <th style="width: 25%">Alternative</th>
+                    <th style="width: 35%">Pros & Cons</th>
+                    <th style="width: 40%">Why Lambda is Better for this Project</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Direct Glue Trigger</strong></td>
+                    <td>
+                        <span class="highlight-pro">+ No Lambda needed</span><br/>
+                        <span class="highlight-con">- Glue fails if second file is missing</span>
+                    </td>
+                    <td>If only transaction is uploaded, Glue would boot up, search for position, fail, and bill you for the execution time. Lambda blocks this.</td>
+                </tr>
+                <tr>
+                    <td><strong>EventBridge Orchestrator</strong></td>
+                    <td>
+                        <span class="highlight-pro">+ Pure serverless workflow</span><br/>
+                        <span class="highlight-con">- Hard to do custom check logic</span>
+                    </td>
+                    <td>EventBridge cannot query a database to check if a sibling file was uploaded hours ago. Lambda can.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step-block">
+        <div class="step-num">STEP 3</div>
+        <h2>State Tracking & Manifest Deduplication (PostgreSQL RDS)</h2>
+        <p>Maintains pipeline status, execution audit logs, and file manifests. The Preprocessor Lambda checks this to detect duplicate uploads.</p>
+        
+        <h3>Why We Used It</h3>
+        <p>Using relational tables with <span class="tag">UNIQUE</span> constraints ensures strict processing limits. It guarantees that the same file is never sent to Glue twice.</p>
+
+        <h3>Alternatives vs. Advantages</h3>
+        <table class="analysis-table">
+            <thead>
+                <tr>
+                    <th style="width: 25%">Alternative</th>
+                    <th style="width: 35%">Pros & Cons</th>
+                    <th style="width: 40%">Why PostgreSQL is Better for this Project</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Amazon DynamoDB</strong></td>
+                    <td>
+                        <span class="highlight-pro">+ Fast, serverless</span><br/>
+                        <span class="highlight-con">- Weak join capabilities, no relational rules</span>
+                    </td>
+                    <td>We already store our data quality rules in the database. Placing the manifest there lets us run relational queries to check file pairs in one database call.</td>
+                </tr>
+                <tr>
+                    <td><strong>S3 Metadata Tagging</strong></td>
+                    <td>
+                        <span class="highlight-pro">+ Zero database cost</span><br/>
+                        <span class="highlight-con">- No cross-file indexing or query capability</span>
+                    </td>
+                    <td>Cannot query S3 tags to ask: "Are there any unregistered files left in Batch 2?" PostgreSQL indexes this instantly.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step-block">
+        <div class="step-num">STEP 4</div>
+        <h2>ETL Execution Engine (AWS Glue PySpark)</h2>
+        <p>The processing core. Ingests raw CSV data into Spark DataFrames, runs type casting, performs DQ validations, and writes outputs.</p>
+        
+        <h3>Why We Used It</h3>
+        <p>AWS Glue offers a serverless Spark runtime. It provides scale-out parallel processing for massive files, native AWS Glue Catalog connections, and Apache Iceberg support.</p>
+
+        <h3>Alternatives vs. Advantages</h3>
+        <table class="analysis-table">
+            <thead>
+                <tr>
+                    <th style="width: 25%">Alternative</th>
+                    <th style="width: 35%">Pros & Cons</th>
+                    <th style="width: 40%">Why AWS Glue is Better for this Project</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Amazon EMR Cluster</strong></td>
+                    <td>
+                        <span class="highlight-pro">+ Full cluster configuration</span><br/>
+                        <span class="highlight-con">- High management overhead, pay for idle nodes</span>
+                    </td>
+                    <td>EMR is expensive for episodic batch runs. Glue is serverless, boots up automatically, and scales to zero.</td>
+                </tr>
+                <tr>
+                    <td><strong>ECS Fargate (Python)</strong></td>
+                    <td>
+                        <span class="highlight-pro">+ Very fast start times</span><br/>
+                        <span class="highlight-con">- Single node limits, memory constraints</span>
+                    </td>
+                    <td>Python containers crash if file sizes exceed RAM. Glue PySpark spills memory to disk and scales horizontally across multiple nodes.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step-block">
+        <div class="step-num">STEP 5</div>
+        <h2>Configuration-Driven DQ Engine (Spark SQL Expressions)</h2>
+        <p>Validation engine reading rules dynamically from <span class="tag">dq_rule_registry</span> and evaluating them via Spark's native <span class="tag">expr()</span>.</p>
+        
+        <h3>Why We Used It</h3>
+        <p>Decouples business validation logic from Python code. Adding, updating, or deactivating a rule is a simple SQL row update rather than a code deployment.</p>
+
+        <h3>Alternatives vs. Advantages</h3>
+        <table class="analysis-table">
+            <thead>
+                <tr>
+                    <th style="width: 25%">Alternative</th>
+                    <th style="width: 35%">Pros & Cons</th>
+                    <th style="width: 40%">Why our DB-driven Engine is Better</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Code-Hardcoded Validations</strong></td>
+                    <td>
+                        <span class="highlight-pro">+ Easy to code first time</span><br/>
+                        <span class="highlight-con">- High maintenance; requires redeployment to fix</span>
+                    </td>
+                    <td>With our engine, business users can update rules (e.g. changing the currency list) without developer resources.</td>
+                </tr>
+                <tr>
+                    <td><strong>Great Expectations Library</strong></td>
+                    <td>
+                        <span class="highlight-pro">+ Feature rich, profiles data</span><br/>
+                        <span class="highlight-con">- Complex configuration, slow runtime overhead</span>
+                    </td>
+                    <td>Our engine uses native Spark SQL expressions, which compiled directly into optimized JVM bytecode, maintaining high speed.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="step-block">
+        <div class="step-num">STEP 6</div>
+        <h2>Curated Data Table Format (Apache Iceberg)</h2>
+        <p>The curated destination storage layer for validated clean and quarantined datasets.</p>
+        
+        <h3>Why We Used It</h3>
+        <p>Apache Iceberg is a modern lakehouse table format. It provides ACID transactions, partition layout evolution (e.g. changing partition layouts without rewriting historical records), and time-travel history.</p>
+
+        <h3>Alternatives vs. Advantages</h3>
+        <table class="analysis-table">
+            <thead>
+                <tr>
+                    <th style="width: 25%">Alternative</th>
+                    <th style="width: 35%">Pros & Cons</th>
+                    <th style="width: 40%">Why Apache Iceberg is Better</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Raw CSV / Parquet</strong></td>
+                    <td>
+                        <span class="highlight-pro">+ Simple format</span><br/>
+                        <span class="highlight-con">- No transactions, slow updates, partition locks</span>
+                    </td>
+                    <td>Parquet lacks ACID. If a write fails halfway, you get corrupted files. Iceberg guarantees atomic rollbacks.</td>
+                </tr>
+                <tr>
+                    <td><strong>Delta Lake</strong></td>
+                    <td>
+                        <span class="highlight-pro">+ High speed, ACID</span><br/>
+                        <span class="highlight-con">- Vendor lock-in (Databricks)</span>
+                    </td>
+                    <td>Iceberg is open-source, fully supported natively by AWS Glue, Athena, Snowflake, and BigQuery without custom plugins.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- STEP 7 -->
+    <div class="step-block">
+        <div class="step-num">STEP 7</div>
+        <h2>Operational Correction Assistant (HTML Dashboard)</h2>
+        <p>Automated output of dynamic reporting showing run outcomes, AI data narratives, and repair directives for anomalies.</p>
+        
+        <h3>Why We Used It</h3>
+        <p>Saves hours of debugging. Operations teams get an immediate visual layout explaining exactly why records failed and what values to fix.</p>
+
+        <h3>Alternatives vs. Advantages</h3>
+        <table class="analysis-table">
+            <thead>
+                <tr>
+                    <th style="width: 25%">Alternative</th>
+                    <th style="width: 35%">Pros & Cons</th>
+                    <th style="width: 40%">Why our HTML Report is Better</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Database Logs Only</strong></td>
+                    <td>
+                        <span class="highlight-pro">+ Zero code work</span><br/>
+                        <span class="highlight-con">- Relies on SQL skills, slow lookup</span>
+                    </td>
+                    <td>Business users and data operators cannot easily read raw database tables. The HTML report is graphical and self-explanatory.</td>
+                </tr>
+                <tr>
+                    <td><strong>Slack Alerts Only</strong></td>
+                    <td>
+                        <span class="highlight-pro">+ Real-time notice</span><br/>
+                        <span class="highlight-con">- Messages get buried, format is limited</span>
+                    </td>
+                    <td>A Slack alert cannot easily hold a table of 50 bad records with separate repair steps. The dashboard organizes this in a clean format.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

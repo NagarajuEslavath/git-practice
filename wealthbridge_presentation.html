@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WealthBridge Platform Slide Presentation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0b10;
+            --bg-secondary: #12141c;
+            --accent-blue: #00b0ff;
+            --accent-green: #00e676;
+            --accent-purple: #af52de;
+            --accent-red: #ff3d00;
+            --text-main: #f0f2f5;
+            --text-muted: #8b949e;
+            --border-color: #262c40;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .slide-container {
+            width: 90%;
+            max-width: 1200px;
+            height: 80%;
+            max-height: 700px;
+            position: relative;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 4rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        .slide {
+            display: none;
+            height: 100%;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-header {
+            margin-bottom: 2rem;
+        }
+
+        .slide-category {
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--accent-blue);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .slide-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            background: linear-gradient(135deg, var(--text-main), #8b949e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            font-size: 1.15rem;
+            color: #d1d5db;
+        }
+
+        /* Title Slide Custom Layout */
+        .title-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            height: 100%;
+        }
+
+        .title-slide h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+
+        .title-slide p {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            max-width: 700px;
+        }
+
+        .author-info {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.5rem;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Standard Grid lists */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .bullet-list {
+            list-style: none;
+        }
+
+        .bullet-list li {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 1.2rem;
+            font-size: 1.15rem;
+        }
+
+        .bullet-list li::before {
+            content: '➔';
+            position: absolute;
+            left: 0;
+            color: var(--accent-green);
+        }
+
+        .highlight-card {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .highlight-card h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            color: var(--accent-green);
+            margin-bottom: 0.8rem;
+        }
+
+        /* Controls Footer */
+        .slide-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .slide-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        /* Stack visual */
+        .tech-badge-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .tech-badge {
+            background-color: #1e2230;
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.95rem;
+            color: #ffb74d;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="slide-container">
+        
+        <!-- SLIDE 1: Title -->
+        <div class="slide active" id="slide-1">
+            <div class="title-slide">
+                <h1>WealthBridge Financial Data Platform</h1>
+                <p>Enterprise Real-time Data Ingestion, Quality Assurance & Data Lakehouse Architecture</p>
+                <div class="author-info">
+                    <strong>Architectural Deck</strong><br/>
+                    Built with AWS Serverless, PySpark, & Apache Iceberg
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: Use Case & Business Problem -->
+        <div class="slide" id="slide-2">
+            <div class="slide-header">
+                <div class="slide-category">The Business Challenge</div>
+                <div class="slide-title">Use Case & Problem Statement</div>
+            </div>
+            <div class="slide-content">
+                <div class="grid-2">
+                    <ul class="bullet-list">
+                        <li><strong>Unstructured Data Streams</strong>: Legacy upstream pipelines emit disjointed batches of transaction and position records without transactional guarantees.</li>
+                        <li><strong>Out-of-Order Delivery</strong>: Sibling data uploads (e.g. Transactions vs Positions) arrive asynchronously, causing processing faults.</li>
+                        <li><strong>Data Quality Risk</strong>: Invalid currencies, duplicated ledger IDs, and negative pricing corrupt downstream calculations.</li>
+                    </ul>
+                    <div class="highlight-card">
+                        <h4>Goal Statement</h4>
+                        <p>Build a resilient, cost-efficient, zero-maintenance pipeline that validates data quality dynamically, quarantines bad records, and writes transactional outputs to a curated lakehouse.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: System Overview -->
+        <div class="slide" id="slide-3">
+            <div class="slide-header">
+                <div class="slide-category">System Design</div>
+                <div class="slide-title">Project Solution Overview</div>
+            </div>
+            <div class="slide-content">
+                <div class="grid-2">
+                    <div class="highlight-card">
+                        <h4>Event-Driven Push Architecture</h4>
+                        <p>No cron scheduling. Files are processed instantly upon arrival via S3 events, Preprocessor Lambda gates, and AWS Glue ETL compute.</p>
+                    </div>
+                    <ul class="bullet-list">
+                        <li><strong>Deduplicated Ingestion</strong>: Strict manifest validation ensures that already processed files are blocked instantly.</li>
+                        <li><strong>Dynamic Quality Registry</strong>: Relational SQL rule database loads validation constraints dynamically at runtime (no code re-deploys).</li>
+                        <li><strong>Open Lakehouse Tables</strong>: Written to S3 in Apache Iceberg format for ACID transactions and partition evolution.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: Workflow Steps -->
+        <div class="slide" id="slide-4">
+            <div class="slide-header">
+                <div class="slide-category">Data Flow</div>
+                <div class="slide-title">Chronological Operational Workflow</div>
+            </div>
+            <div class="slide-content">
+                <ul class="bullet-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <li><strong>1. Drop</strong>: CSV files are uploaded into the S3 Landing Bucket.</li>
+                    <li><strong>2. Match</strong>: Preprocessor Lambda fuzzy matches names to TRANSACTION or POSITION.</li>
+                    <li><strong>3. Record</strong>: Key metadata is inserted into the <code>file_manifest</code> table.</li>
+                    <li><strong>4. Evaluate</strong>: Lambda checks if both matching files of a <code>file_id</code> are registered.</li>
+                    <li><strong>5. Trigger</strong>: If complete, status is set to TRIGGERED and the AWS Glue job runs.</li>
+                    <li><strong>6. ETL & Write</strong>: Glue loads active rules, cleanses data, and appends to Iceberg tables.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: Lambda Gatekeeper -->
+        <div class="slide" id="slide-5">
+            <div class="slide-header">
+                <div class="slide-category">Compute Optimizations</div>
+                <div class="slide-title">Gatekeeper Orchestrator (AWS Lambda)</div>
+            </div>
+            <div class="slide-content">
+                <div class="grid-2">
+                    <p>Instead of triggering expensive Spark clusters directly from S3 events, the pipeline utilizes a lightweight **AWS Lambda** function. It queries PostgreSQL to verify pair completeness before starting Glue.</p>
+                    <div class="highlight-card">
+                        <h4>Business Advantages</h4>
+                        <ul class="bullet-list" style="padding-left:0; margin-bottom:0;">
+                            <li><strong>90% cost savings</strong> by preventing Glue from starting with partial files.</li>
+                            <li><strong>Stateful hold</strong>: safely caches out-of-order uploads.</li>
+                            <li><strong>Zero server footprint</strong>: runs serverless, billing only for execution milliseconds.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: DQ Engine -->
+        <div class="slide" id="slide-6">
+            <div class="slide-header">
+                <div class="slide-category">Data Governance</div>
+                <div class="slide-title">Configuration-Driven DQ Engine</div>
+            </div>
+            <div class="slide-content">
+                <div class="grid-2">
+                    <ul class="bullet-list">
+                        <li><strong>No Hardcoding</strong>: Business constraints are cataloged as standard SQL statements inside <code>dq_rule_registry</code>.</li>
+                        <li><strong>Dynamic Compilation</strong>: The Engine compiles SQL registry checks into Spark SQL <code>expr()</code> boolean filters at run time.</li>
+                        <li><strong>Failure Accumulation</strong>: Stores all failed rule codes and error descriptions in a vector rather than failing on the first error.</li>
+                    </ul>
+                    <div class="highlight-card">
+                        <h4>Supported Rule Types</h4>
+                        <p><code>NOT_NULL</code>, <code>UNIQUE</code> (within-batch duplicates rejected), <code>ALLOWED_VALUES</code> (allow-list validation), and <code>EXPRESSION</code> (Spark Boolean SQL check).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 7: apache iceberg -->
+        <div class="slide" id="slide-7">
+            <div class="slide-header">
+                <div class="slide-category">Data Lakehouse</div>
+                <div class="slide-title">Target Storage (Apache Iceberg)</div>
+            </div>
+            <div class="slide-content">
+                <div class="grid-2">
+                    <div class="highlight-card">
+                        <h4>Why Apache Iceberg?</h4>
+                        <p>Provides transactional consistency on S3 data lakes. Good records flow to <code>_good</code> curated tables; bad records flow to <code>_bad</code> quarantine tables.</p>
+                    </div>
+                    <ul class="bullet-list">
+                        <li><strong>ACID Transactions</strong>: Guarantees atomic commits and rollbacks. Re-running a job never creates duplicate lines.</li>
+                        <li><strong>Schema Evolution</strong>: Columns can be added or updated dynamically over time without breaking historical logs.</li>
+                        <li><strong>Hidden Partitioning</strong>: Automatically partitions datasets by <code>batch_id</code> for sub-second Athena query lookups.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 8: Operations Dashboard -->
+        <div class="slide" id="slide-8">
+            <div class="slide-header">
+                <div class="slide-category">Reporting & Audit</div>
+                <div class="slide-title">Operational Correction Assistant</div>
+            </div>
+            <div class="slide-content">
+                <div class="grid-2">
+                    <ul class="bullet-list">
+                        <li><strong>Consolidated Dashboard</strong>: Generates an interactive dark-mode HTML report summarizing metrics, stats, and rule failure frequencies.</li>
+                        <li><strong>AI Analyst Summary</strong>: Translates stats into plain-english analysis (e.g. flagging specific columns causing the most failures).</li>
+                        <li><strong>Actionable Repair Guidelines</strong>: Maps failed rule IDs directly to correction instructions for operations teams.</li>
+                    </ul>
+                    <div class="highlight-card">
+                        <h4>Latest Report Path</h4>
+                        <p>Saved at <code>reports/latest_report.html</code> and archived by run ID under <code>reports/</code> for easy browser preview.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 9: Tech Stack -->
+        <div class="slide" id="slide-9">
+            <div class="slide-header">
+                <div class="slide-category">Infrastructure</div>
+                <div class="slide-title">Core Technology Stack</div>
+            </div>
+            <div class="slide-content">
+                <p>The platform relies on modern, cloud-native components selected for scale, durability, and serverless execution:</p>
+                <div class="tech-badge-container">
+                    <span class="tech-badge">Python 3.12</span>
+                    <span class="tech-badge">PySpark 3.3 (Glue 4.0)</span>
+                    <span class="tech-badge">Apache Iceberg</span>
+                    <span class="tech-badge">AWS Lambda</span>
+                    <span class="tech-badge">AWS SAM</span>
+                    <span class="tech-badge">PostgreSQL RDS</span>
+                    <span class="tech-badge">Amazon S3</span>
+                    <span class="tech-badge">Pytest</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 10: Production Readiness -->
+        <div class="slide" id="slide-10">
+            <div class="slide-header">
+                <div class="slide-category">Future Scope</div>
+                <div class="slide-title">Production Readiness & Improvements</div>
+            </div>
+            <div class="slide-content">
+                <ul class="bullet-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <li><strong>Secrets Manager Integration</strong>: Dynamically retrieve RDS passwords via AWS Secrets Manager instead of environment variables.</li>
+                    <li><strong>CI/CD Pipelines</strong>: Automate test execution (pytest) and SAM deployments via GitHub Actions.</li>
+                    <li><strong>Real-time Alerting</strong>: Integrate AWS SNS to send emails/Slack alerts on partial or failed runs.</li>
+                    <li><strong>Monitoring Dashboards</strong>: Connect Datadog or CloudWatch to track Glue run times and SLA limits.</li>
+                    <li><strong>Data Warehousing</strong>: Expose curated Iceberg tables directly in Redshift Spectrum for BI reporting.</li>
+                    <li><strong>DLQ Pattern</strong>: Move rejected files to an S3 Dead Letter Queue (DLQ) for auto-notification.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SLIDE 11: Business Outcomes -->
+        <div class="slide" id="slide-11">
+            <div class="slide-header">
+                <div class="slide-category">Conclusion</div>
+                <div class="slide-title">Key Project Outcomes</div>
+            </div>
+            <div class="slide-content">
+                <div class="grid-2">
+                    <div class="highlight-card">
+                        <h4>Measurable Impact</h4>
+                        <p>Delivers a secure, transactional ledger intake pipeline that runs at minimum AWS compute cost and scales horizontally on demand.</p>
+                    </div>
+                    <ul class="bullet-list">
+                        <li><strong>99.9% cost reduction</strong> for scheduling, relying on events instead of idle EC2 nodes.</li>
+                        <li><strong>Zero redeployment friction</strong> for business operations changes.</li>
+                        <li><strong>Fast resolution time</strong>: clear guidelines reduce debugging from hours to minutes.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER CONTROLS -->
+        <div class="slide-footer">
+            <div class="slide-number" id="slide-num">Slide 1 of 11</div>
+            <div class="controls">
+                <button class="btn" id="prev-btn" onclick="changeSlide(-1)">Previous</button>
+                <button class="btn" id="next-btn" onclick="changeSlide(1)">Next</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 11;
+
+        function updateSlide() {
+            // Hide all slides
+            for (let i = 1; i <= totalSlides; i++) {
+                document.getElementById(`slide-${i}`).classList.remove('active');
+            }
+            // Show active slide
+            document.getElementById(`slide-${currentSlide}`).classList.add('active');
+            // Update slide indicator
+            document.getElementById('slide-num').innerText = `Slide ${currentSlide} of ${totalSlides}`;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 1) currentSlide = 1;
+            if (currentSlide > totalSlides) currentSlide = totalSlides;
+            updateSlide();
+        }
+
+        // Add keyboard arrow support
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (event.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+    </script>
+</body>
+</html>
